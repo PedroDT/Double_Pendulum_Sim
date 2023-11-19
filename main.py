@@ -4,20 +4,21 @@ from math import sin, cos, pi, sqrt
 
 # GLOBAL VARIABLES
 
-m1, m2 = 40, 40  # Mass of the pendulum
+m1, m2 = 15, 15  # Mass of the pendulum
 ang1, ang2 = pi / 2, pi / 8
-leng1, leng2 = 200, 200
-window_size = (1280, 720)
-verts = (window_size[0] / 2, 250)
+leng1, leng2 = 100, 100
+window_size = (414, 896)
+verts = (window_size[0] / 2, 300)
 initial_point = (0, 0)
 trace = []
-trace_size = 1000
+trace1 = []
+final_trace = []
+trace_size = 20
 framesbt = 1
 counter = 0
-gravity = 2
-air_resistance = 1
-FPS = 45
-img_num = 1
+gravity = 1
+air_resistance = .9985
+FPS = 60
 
 # CLASSES
 
@@ -65,8 +66,8 @@ class Pendulum:
         self.vel *= air_resistance
 
     def draw(self, surface):
-        pygame.draw.line(surface, 'black', self.vertice, self.final_position, width=4)
-        pygame.draw.circle(surface, 'black', self.final_position, self.mass / 2)
+        pygame.draw.line(surface, 'white', self.vertice, self.final_position, width=4)
+        pygame.draw.circle(surface, 'white', self.final_position, self.mass / 2)
 
 
 def distance_b2p(point_a, point_b):
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     radius_p2 = pendulum_2.mass
     clock = pygame.time.Clock()
     mouse_clicked = False
-
+    
     while True:
 
         for event in pygame.event.get():
@@ -104,7 +105,7 @@ if __name__ == '__main__':
             elif event.type == MOUSEBUTTONUP:
                 mouse_clicked = False
 
-        pygame.draw.rect(window, 'white', initial_point + window_size)
+        pygame.draw.rect(window, 'black', initial_point + window_size)
 
         if not mouse_clicked:
             pendulum_1.get_position()
@@ -121,18 +122,26 @@ if __name__ == '__main__':
             pendulum_2.length = distance_b2p(pendulum_2.vertice, pendulum_2.final_position)
 
         if counter >= framesbt:
-            trace.append(pendulum_2.final_position)
-            counter = 0
+          trace.append(pendulum_2.final_position)
+          trace1.append(pendulum_1.final_position)         
+          counter = 0
 
         if len(trace) >= 2:
-            pygame.draw.lines(window, 'black', False, trace, width=4)
+            #pygame.draw.lines(window, 'green', False, trace, width=4)
             if len(trace) >= trace_size:
                 trace.pop(0)
+                trace1.pop(0)
+                final_trace.append(trace[0])
+                if len(final_trace) >= 2:
+                  pygame.draw.lines(window, 'red', False, final_trace, width=4)
+                  if len(final_trace) >= 5:
+                    #final_trace.pop(0)            
+                    pass
+            pygame.draw.lines(window, 'green', False, trace, width=4)
+            pygame.draw.lines(window, 'blue', False, trace1, width=4)                                  
 
         counter += 1
         pendulum_1.draw(window)
         pendulum_2.draw(window)
         pygame.display.update()
-        pygame.image.save(window, f"DouPendu_{img_num}.jpeg")
-        img_num += 1
         clock.tick(FPS)
